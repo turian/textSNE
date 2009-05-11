@@ -10,6 +10,8 @@ Just call the method calc_tsne(dataMatrix)
 Created by Philippe Hamel
 hamelphi@iro.umontreal.ca
 October 24th 2008
+
+Modified by Joseph Turian (also of UMontreal)
 """
 
 from struct import *
@@ -17,15 +19,16 @@ import sys
 import os
 from numpy import *
 
-def calc_tsne(dataMatrix,NO_DIMS=2,PERPLEX=30,INITIAL_DIMS=30,LANDMARKS=1):
+def calc_tsne(dataMatrix,NO_DIMS=2,PERPLEX=30,INITIAL_DIMS=30,LANDMARKS=1,USE_PCA=True):
     """
     This is the main function.
     dataMatrix is a 2D numpy array containing your data (each row is a data point)
     Remark : LANDMARKS is a ratio (0<LANDMARKS<=1)
     If LANDMARKS == 1 , it returns the list of points in the same order as the input
     """
-    
-    dataMatrix=PCA(dataMatrix,INITIAL_DIMS)
+
+    if USE_PCA:
+        dataMatrix=PCA(dataMatrix,INITIAL_DIMS)
     writeDat(dataMatrix,NO_DIMS,PERPLEX,LANDMARKS)
     tSNE()
     Xmat,LM,costs=readResult()
@@ -50,7 +53,6 @@ def PCA(dataMatrix, INITIAL_DIMS) :
     (eigValues,eigVectors)=linalg.eig(cov(dataMatrix.T))
     perm=argsort(-eigValues)
     eigVectors=eigVectors[:,perm[0:INITIAL_DIMS]]
-    dataMatrix=dot(dataMatrix,eigVectors)
     return dataMatrix
 
 def readbin(type,file) :
@@ -69,7 +71,7 @@ def writeDat(dataMatrix,NO_DIMS,PERPLEX,LANDMARKS):
     f = open('data.dat', 'wb')
     f.write(pack('=iiid',n,d,NO_DIMS,PERPLEX))
     f.write(pack('=d',LANDMARKS))
-    for inst in dataMatrix :
+    for inst in dataMatrix.tolist() :
         for el in inst :
             f.write(pack('=d',el))
     f.close()
