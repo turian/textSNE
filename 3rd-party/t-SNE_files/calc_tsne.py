@@ -72,6 +72,7 @@ def writeDat(dataMatrix,NO_DIMS,PERPLEX,LANDMARKS):
     f.write(pack('=iiid',n,d,NO_DIMS,PERPLEX))
     f.write(pack('=d',LANDMARKS))
     for inst in dataMatrix.tolist() :
+#    for inst in dataMatrix :
         for el in inst :
             f.write(pack('=d',el))
     f.close()

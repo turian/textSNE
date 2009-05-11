@@ -1,0 +1,11 @@
+syntax: glob
+
+*~
+*.dat
+*.o
+*.orig
+*.png
+*.pyc
+*.pyo
+*.so
+*.sw?
