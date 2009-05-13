@@ -1,12 +1,17 @@
 """
 Render t-SNE text labels.
-Requires PIL (Python Imaging Library)
+Requires PIL (Python Imaging Library) and ImageMagick "convert" command.
 """
 
 import sys
 import Image, ImageFont, ImageDraw, ImageChops, string
 
-def render(points, filename, width=2000, height=1200, fontfile="/u/turian/fonts/Vera.ttf", fontsize=12, margin=0.05, transparency=0.5):
+import os.path
+DEFAULT_FONT=os.path.join(os.path.expanduser('~'), "fonts/Vera.ttf")
+
+import tempfile
+
+def render(points, filename, width=2000, height=1200, fontfile=DEFAULT_FONT, fontsize=12, margin=0.05, transparency=0.25):
     """
     Render t-SNE text points to an image file.
     points is a list of tuples of the form (title, x, y).
@@ -24,6 +29,7 @@ def render(points, filename, width=2000, height=1200, fontfile="/u/turian/fonts/
     # use a bitmap font
     #font = ImageFont.load("/usr/share/fonts/liberation/LiberationSans-Italic.ttf")
 
+    assert os.path.exists(fontfile)
     font = ImageFont.truetype(fontfile, fontsize)
     
     #draw = ImageDraw.Draw(im)
@@ -65,8 +71,8 @@ def render(points, filename, width=2000, height=1200, fontfile="/u/turian/fonts/
         pos = (x, y)
         imtext = Image.new("L", im.size, 0)
         drtext = ImageDraw.Draw(imtext)
-#        drtext.text(pos, title, font=font, fill=(256-256*transparency))
-        drtext.text(pos, title, font=font, fill=128)
+        drtext.text(pos, title, font=font, fill=(256-256*transparency))
+#        drtext.text(pos, title, font=font, fill=128)
 
     # Add the white text to our collected alpha channel. Gray pixels around
     # the edge of the text will eventually become partially transparent
@@ -87,6 +93,13 @@ def render(points, filename, width=2000, height=1200, fontfile="/u/turian/fonts/
     
     # Add the alpha channel to the image, and save it out.
     im.putalpha(alpha)
+
+    tmpf = tempfile.NamedTemporaryFile(suffix=".png")
+
     #im.save("transtext.png", "PNG")
-    print >> sys.stderr, "Rendering to file", filename
-    im.save(filename)
+    print >> sys.stderr, "Rendering alpha image to file", tmpf.name
+    im.save(tmpf.name)
+
+    cmd = "convert %s -background white -flatten %s" % (tmpf.name, filename)
+    print >> sys.stderr, "Flattening image", tmpf.name, "to", filename, "using command:", cmd
+    os.system(cmd)
