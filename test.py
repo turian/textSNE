@@ -6,7 +6,7 @@ from common.file import myopen
 (example_metadata, examples) = cPickle.load(myopen("/u/turian/dev/python/nlpreprocess/wikipedia/work-legal/sparseexamples.unshuffled.pkl"))
 x = examples.todense()
 titles = [e["title"] for e in example_metadata]
-#x = x[:500]
+x = x[:500]
 
 #import string, numpy
 #o = open("/u/turian/data/word_embeddings.collobert-and-weston/lm-weights.txt")
@@ -18,6 +18,11 @@ titles = [e["title"] for e in example_metadata]
 #x = x[:500]
 #titles = titles[:500]
 
+def normalize(x):
+    import numpy
+    return x / numpy.sum(x, axis=1)
+
+x = normalize(x)
 
 from calc_tsne import calc_tsne
 #print x.shape
