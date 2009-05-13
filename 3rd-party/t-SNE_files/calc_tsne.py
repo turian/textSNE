@@ -11,13 +11,19 @@ Created by Philippe Hamel
 hamelphi@iro.umontreal.ca
 October 24th 2008
 
-Modified by Joseph Turian (also of UMontreal)
+Modified by Joseph Turian (also of UMontreal):
+    * Added USE_PCA parameter.
+    * Call tolist() on matrix before iterating and writing its data out.
+    * print everything to stderr, not stdout.
+    * Assume that tsne executables are in the same directory as this module.
 """
 
 from struct import *
 import sys
 import os
 from numpy import *
+
+TSNE_DIRECTORY = os.path.dirname(__file__)
 
 def calc_tsne(dataMatrix,NO_DIMS=2,PERPLEX=30,INITIAL_DIMS=30,LANDMARKS=1,USE_PCA=True):
     """
@@ -43,7 +49,7 @@ def PCA(dataMatrix, INITIAL_DIMS) :
     Performs PCA on data.
     Reduces the dimensionality to INITIAL_DIMS
     """
-    print 'Performing PCA'
+    print >> sys.stderr, 'Performing PCA'
 
     dataMatrix= dataMatrix-dataMatrix.mean(axis=0)
 
@@ -65,8 +71,8 @@ def writeDat(dataMatrix,NO_DIMS,PERPLEX,LANDMARKS):
     """
     Generates data.dat
     """
-    print 'Writing data.dat'
-    print 'Dimension of projection : %i \nPerplexity : %i \nLandmarks(ratio) : %f'%(NO_DIMS,PERPLEX,LANDMARKS)
+    print >> sys.stderr, 'Writing data.dat'
+    print >> sys.stderr, 'Dimension of projection : %i \nPerplexity : %i \nLandmarks(ratio) : %f'%(NO_DIMS,PERPLEX,LANDMARKS)
     n,d = dataMatrix.shape
     f = open('data.dat', 'wb')
     f.write(pack('=iiid',n,d,NO_DIMS,PERPLEX))
@@ -83,17 +89,18 @@ def tSNE():
     Calls the tsne c++ implementation depending on the platform
     """
     platform=sys.platform
-    print'Platform detected : %s'%platform
+    print >> sys.stderr,'Platform detected : %s'%platform
     if platform in ['mac', 'darwin'] :
-        cmd='./tSNE_maci'
+        cmd='tSNE_maci'
     elif platform == 'win32' :
-        cmd='./tSNE_win'
+        cmd='tSNE_win'
     elif platform == 'linux2' :
-        cmd='./tSNE_linux'
+        cmd='tSNE_linux'
     else :
-        print 'Not sure about the platform, we will try linux version...'
-        cmd='./tSNE_linux'
-    print 'Calling executable "%s"'%cmd
+        print >> sys.stderr, 'Not sure about the platform, we will try linux version...'
+        cmd='tSNE_linux'
+    cmd = os.path.join(TSNE_DIRECTORY, cmd)
+    print >> sys.stderr, 'Calling executable "%s"'%cmd
     os.system(cmd)
     
 
@@ -101,7 +108,7 @@ def readResult():
     """
     Reads result from result.dat
     """
-    print 'Reading result.dat'
+    print >> sys.stderr, 'Reading result.dat'
     f=open('result.dat','rb')
     n,ND=readbin('ii',f)
     Xmat=empty((n,ND))
@@ -118,7 +125,7 @@ def reOrder(Xmat, LM):
     Re-order the data in the original order
     Call only if LANDMARKS==1
     """
-    print 'Reordering results'
+    print >> sys.stderr, 'Reordering results'
     X=zeros(Xmat.shape)
     for i,lm in enumerate(LM):
         X[lm]=Xmat[i]
@@ -128,6 +135,6 @@ def clearData():
     """
     Clears files data.dat and result.dat
     """
-    print 'Clearing data.dat and result.dat'
+    print >> sys.stderr, 'Clearing data.dat and result.dat'
     os.system('rm data.dat')
     os.system('rm result.dat')
