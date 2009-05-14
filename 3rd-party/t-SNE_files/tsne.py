@@ -9,9 +9,22 @@
 #
 #  Created by Laurens van der Maaten on 20-12-08.
 #  Copyright (c) 2008 Tilburg University. All rights reserved.
+#
+#  Modified by Joseph Turian:
+#   * Use psyco if available.
+#
 
 import numpy as Math
 import pylab as Plot
+
+import sys
+try:
+    import psyco
+    psyco.full()
+    print >> sys.stderr, "psyco is usable!"
+except:
+    print >> sys.stderr, "No psyco"
+    
 	
 def Hbeta(D = Math.array([]), beta = 1.0):
 	"""Compute the perplexity and the P-row for a specific value of the precision of a Gaussian distribution."""
