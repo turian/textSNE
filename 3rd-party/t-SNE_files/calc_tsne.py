@@ -30,7 +30,7 @@ TSNE_DIRECTORY = os.path.dirname(__file__)
 
 #def calc_tsne(dataMatrix,NO_DIMS=2,PERPLEX=30,INITIAL_DIMS=30,landmarks=1,USE_PCA=True):
 #def calc_tsne(dataMatrix,NO_DIMS=2,PERPLEX=30,INITIAL_DIMS=30,landmarks=1,USE_PCA=False):
-def tsne(X = Math.array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0, landmarks=1, use_pca=False):
+def tsne(X = array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0, landmarks=1, use_pca=False):
     """
     This is the main function.
     X is a 2D numpy array containing your data (each row is a data point)
