@@ -11,7 +11,7 @@ DEFAULT_FONT=os.path.join(os.path.expanduser('~'), "fonts/Vera.ttf")
 
 import tempfile
 
-def render(points, filename, width=3000, height=1800, fontfile=DEFAULT_FONT, fontsize=12, margin=0.05, transparency=0.25):
+def render(points, filename, width=3000, height=1800, fontfile=DEFAULT_FONT, fontsize=12, margin=0.05, transparency=0.5):
     """
     Render t-SNE text points to an image file.
     points is a list of tuples of the form (title, x, y).
@@ -71,6 +71,7 @@ def render(points, filename, width=3000, height=1800, fontfile=DEFAULT_FONT, fon
         pos = (x, y)
         imtext = Image.new("L", im.size, 0)
         drtext = ImageDraw.Draw(imtext)
+        print >> sys.stderr, "Rendering title (#%d):" % idx, repr(title)
         drtext.text(pos, title, font=font, fill=(256-256*transparency))
 #        drtext.text(pos, title, font=font, fill=128)
 
