@@ -14,6 +14,9 @@ October 24th 2008
 Modified by Joseph Turian (also of UMontreal):
     * Added USE_PCA parameter.
     * Call tolist() on matrix before iterating and writing its data out.
+    * Do all t-SNE temporary output in a temporary directory, to prevent
+    it from clobbering its own output (if two copies of this process
+    are running).
     * print everything to stderr, not stdout.
     * Assume that tsne executables are in the same directory as this module.
 
@@ -38,6 +41,13 @@ def tsne(X = array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0, landm
     If landmarks == 1 , it returns the list of points in the same order as the input
     """
 
+    # Move into a temporary directory
+    import os, tempfile
+    oldwd = os.getcwd()
+    tmpd = tempfile.mkdtemp()
+    os.chdir(tmpd)
+    print >> sys.stderr, "Writing temporary t-SNE data to", tmpd
+
     if use_pca:
         X=PCA(X,initial_dims)
     writeDat(X, no_dims,perplexity, landmarks)
@@ -46,7 +56,9 @@ def tsne(X = array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0, landm
     clearData()
     if landmarks==1:
         X=reOrder(Xmat,LM)
+        os.chdir(oldwd)
         return X
+    os.chdir(oldwd)
     return Xmat,LM
 
 def PCA(dataMatrix, INITIAL_DIMS) :
