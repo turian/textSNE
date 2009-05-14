@@ -16,6 +16,9 @@ Modified by Joseph Turian (also of UMontreal):
     * Call tolist() on matrix before iterating and writing its data out.
     * print everything to stderr, not stdout.
     * Assume that tsne executables are in the same directory as this module.
+
+TODO:
+    * Make tsne.pca == calc_tsne.PCA
 """
 
 from struct import *
@@ -25,14 +28,14 @@ from numpy import *
 
 TSNE_DIRECTORY = os.path.dirname(__file__)
 
-#def calc_tsne(dataMatrix,NO_DIMS=2,PERPLEX=30,INITIAL_DIMS=30,LANDMARKS=1,USE_PCA=True):
-#def calc_tsne(dataMatrix,NO_DIMS=2,PERPLEX=30,INITIAL_DIMS=30,LANDMARKS=1,USE_PCA=False):
+#def calc_tsne(dataMatrix,NO_DIMS=2,PERPLEX=30,INITIAL_DIMS=30,landmarks=1,USE_PCA=True):
+#def calc_tsne(dataMatrix,NO_DIMS=2,PERPLEX=30,INITIAL_DIMS=30,landmarks=1,USE_PCA=False):
 def tsne(X = Math.array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0, landmarks=1, use_pca=False):
     """
     This is the main function.
     X is a 2D numpy array containing your data (each row is a data point)
-    Remark : LANDMARKS is a ratio (0<LANDMARKS<=1)
-    If LANDMARKS == 1 , it returns the list of points in the same order as the input
+    Remark : landmarks is a ratio (0<landmarks<=1)
+    If landmarks == 1 , it returns the list of points in the same order as the input
     """
 
     if use_pca:
@@ -41,7 +44,7 @@ def tsne(X = Math.array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0, 
     tSNE()
     Xmat,LM,costs=readResult()
     clearData()
-    if LANDMARKS==1:
+    if landmarks==1:
         X=reOrder(Xmat,LM)
         return X
     return Xmat,LM
@@ -69,16 +72,16 @@ def readbin(type,file) :
     """
     return unpack(type,file.read(calcsize(type)))
 
-def writeDat(dataMatrix,NO_DIMS,PERPLEX,LANDMARKS):
+def writeDat(dataMatrix,NO_DIMS,PERPLEX,landmarks):
     """
     Generates data.dat
     """
     print >> sys.stderr, 'Writing data.dat'
-    print >> sys.stderr, 'Dimension of projection : %i \nPerplexity : %i \nLandmarks(ratio) : %f'%(NO_DIMS,PERPLEX,LANDMARKS)
+    print >> sys.stderr, 'Dimension of projection : %i \nPerplexity : %i \nLandmarks(ratio) : %f'%(NO_DIMS,PERPLEX,landmarks)
     n,d = dataMatrix.shape
     f = open('data.dat', 'wb')
     f.write(pack('=iiid',n,d,NO_DIMS,PERPLEX))
-    f.write(pack('=d',LANDMARKS))
+    f.write(pack('=d',landmarks))
     for inst in dataMatrix.tolist() :
 #    for inst in dataMatrix :
         for el in inst :
@@ -125,7 +128,7 @@ def readResult():
 def reOrder(Xmat, LM):
     """
     Re-order the data in the original order
-    Call only if LANDMARKS==1
+    Call only if landmarks==1
     """
     print >> sys.stderr, 'Reordering results'
     X=zeros(Xmat.shape)

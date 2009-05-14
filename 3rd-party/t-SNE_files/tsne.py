@@ -12,6 +12,9 @@
 #
 #  Modified by Joseph Turian:
 #   * Use psyco if available.
+#   * Added parameter use_pca, with default False. NB this changes the default behavior.
+#  TODO:
+#   * Make tsne.pca == calc_tsne.PCA
 #
 
 import numpy as Math
@@ -105,7 +108,7 @@ def pca(X = Math.array([]), no_dims = 50):
 	return Y;
 
 
-def tsne(X = Math.array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0):
+def tsne(X = Math.array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0, use_pca=False):
 	"""Runs t-SNE on the dataset in the NxD array X to reduce its dimensionality to no_dims dimensions.
 	The syntaxis of the function is Y = tsne.tsne(X, no_dims, perplexity), where X is an NxD NumPy array."""
 	
@@ -118,7 +121,8 @@ def tsne(X = Math.array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0):
 	#	return -1;
 	
 	# Initialize variables
-	X = pca(X, initial_dims);
+    if use_pca:
+    	X = pca(X, initial_dims);
 	(n, d) = X.shape;
 	max_iter = 1000;
 	initial_momentum = 0.5;
