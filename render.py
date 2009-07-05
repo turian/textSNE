@@ -7,7 +7,8 @@ import sys
 import Image, ImageFont, ImageDraw, ImageChops, string
 
 import os.path
-DEFAULT_FONT=os.path.join(os.path.expanduser('~'), "fonts/Vera.ttf")
+#DEFAULT_FONT=os.path.join(os.path.expanduser('~'), "fonts/Vera.ttf")
+DEFAULT_FONT=None
 
 import tempfile
 
@@ -29,8 +30,9 @@ def render(points, filename, width=3000, height=1800, fontfile=DEFAULT_FONT, fon
     # use a bitmap font
     #font = ImageFont.load("/usr/share/fonts/liberation/LiberationSans-Italic.ttf")
 
-    assert os.path.exists(fontfile)
-    font = ImageFont.truetype(fontfile, fontsize)
+    if fontfile is not None:
+        assert os.path.exists(fontfile)
+        font = ImageFont.truetype(fontfile, fontsize)
     
     #draw = ImageDraw.Draw(im)
     #draw.text((10, 10), "hello", font=font)
@@ -72,7 +74,10 @@ def render(points, filename, width=3000, height=1800, fontfile=DEFAULT_FONT, fon
         imtext = Image.new("L", im.size, 0)
         drtext = ImageDraw.Draw(imtext)
         print >> sys.stderr, "Rendering title (#%d):" % idx, repr(title)
-        drtext.text(pos, title, font=font, fill=(256-256*transparency))
+        if fontfile is not None:
+            drtext.text(pos, title, font=font, fill=(256-256*transparency))
+        else:
+            drtext.text(pos, title, fill=(256-256*transparency))
 #        drtext.text(pos, title, font=font, fill=128)
 
     # Add the white text to our collected alpha channel. Gray pixels around
