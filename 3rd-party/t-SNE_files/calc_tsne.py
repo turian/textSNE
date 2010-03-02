@@ -46,20 +46,23 @@ def tsne(X = array([]), no_dims = 2, initial_dims = 50, perplexity = 30.0, landm
     oldwd = os.getcwd()
     tmpd = tempfile.mkdtemp()
     os.chdir(tmpd)
-    print >> sys.stderr, "Writing temporary t-SNE data to", tmpd
+    try:
+        print >> sys.stderr, "Writing temporary t-SNE data to", tmpd
 
-    if use_pca:
-        X=PCA(X,initial_dims)
-    writeDat(X, no_dims,perplexity, landmarks)
-    tSNE()
-    Xmat,LM,costs=readResult()
-    clearData()
-    if landmarks==1:
-        X=reOrder(Xmat,LM)
+        if use_pca:
+            X=PCA(X,initial_dims)
+        writeDat(X, no_dims,perplexity, landmarks)
+        tSNE()
+        Xmat,LM,costs=readResult()
+        clearData()
+        if landmarks==1:
+            X=reOrder(Xmat,LM)
+            os.chdir(oldwd)
+            return X
+        return Xmat,LM
+    except:
         os.chdir(oldwd)
-        return X
-    os.chdir(oldwd)
-    return Xmat,LM
+        raise
 
 def PCA(dataMatrix, INITIAL_DIMS) :
     """
